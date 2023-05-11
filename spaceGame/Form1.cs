@@ -152,6 +152,7 @@ namespace spaceGame
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            //draw the players
             e.Graphics.FillRectangle(whiteBrush, player1);
 
             //draw left asteroids
