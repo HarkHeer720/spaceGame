@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Media;
 
 namespace spaceGame
 {
@@ -21,8 +22,17 @@ namespace spaceGame
         List<int> asteroidSpeedsRight = new List<int>();
 
         //declaring players
-        Rectangle player1 = new Rectangle(50, 50, 50, 50);
-        Rectangle player2 = new Rectangle(30, 30, 10, 10);
+        Rectangle player1 = new Rectangle(145, 670, 20, 20);
+        Rectangle player2 = new Rectangle(445, 670, 20, 20);
+
+        Rectangle player1Top = new Rectangle(150, 650, 10, 20);
+        Rectangle player2Top = new Rectangle(450, 650, 10, 20);
+
+        Rectangle player1LeftBoost = new Rectangle(145, 690, 5, 10);
+        Rectangle player1RightBoost = new Rectangle(161, 690, 5, 10);
+
+        Rectangle player2LeftBoost = new Rectangle(445, 690, 5, 10);
+        Rectangle player2RightBoost = new Rectangle(461, 690, 5, 10);
 
         //declaring a randomizer
         Random randGen = new Random();
@@ -44,6 +54,11 @@ namespace spaceGame
 
         //declaring brushes and pens
         SolidBrush whiteBrush = new SolidBrush(Color.White);
+        SolidBrush orangeBrush = new SolidBrush(Color.Orange);
+        Pen whitePen = new Pen(Color.White, 4);
+
+        //creating sound effetcs
+        SoundPlayer rocketSound = new SoundPlayer(Properties.Resources.rocketSound2);
 
         public Form1()
         {
@@ -132,20 +147,40 @@ namespace spaceGame
             if (wDown == true)
             {
                 player1.Y -= playerSpeed;
+                player1Top.Y -= playerSpeed;
+                player1LeftBoost.Y -= playerSpeed;
+                player1RightBoost.Y -= playerSpeed;
+
+                rocketSound.Play();
             }
             if (sDown == true && player1.Y < this.Height - player1.Height)
             {
                 player1.Y += playerSpeed;
+                player1Top.Y += playerSpeed;
+                player1LeftBoost.Y += playerSpeed;
+                player1RightBoost.Y += playerSpeed;
+
+                rocketSound.Stop();
             }
 
             //move player 2
             if (upDown == true)
             {
                 player2.Y -= playerSpeed;
+                player2Top.Y -= playerSpeed;
+                player2LeftBoost.Y -= playerSpeed;
+                player2RightBoost.Y -= playerSpeed;
+
+                rocketSound.Play();
             }
             if (downDown == true && player2.Y < this.Height - player2.Height)
             {
                 player2.Y += playerSpeed;
+                player2Top.Y += playerSpeed;
+                player2LeftBoost.Y += playerSpeed;
+                player2RightBoost.Y += playerSpeed;
+
+                rocketSound.Stop();
             }
 
             //create asteroids on left side
@@ -184,12 +219,67 @@ namespace spaceGame
                 asteroidListRight[i] = new Rectangle(x, asteroidListRight[i].Y, asteroidWidth, asteroidHeight);
             }
 
+            //check if player 1 hit an asteroid
+            for (int i = 0; i < asteroidListRight.Count(); i++)
+            {
+                if (player1.IntersectsWith(asteroidListRight[i]) || player1Top.IntersectsWith(asteroidListRight[i]))
+                {
+                    asteroidListRight.RemoveAt(i);
+                    asteroidSpeedsRight.RemoveAt(i);
+                    player1.Y = 670;
+                    player1Top.Y = 650;
+                    player1LeftBoost.Y = 690;
+                    player1RightBoost.Y = 690;
+                }
+            }
+            for (int i = 0; i < asteroidListLeft.Count(); i++)
+            {
+                if (player1.IntersectsWith(asteroidListLeft[i]) || player1Top.IntersectsWith(asteroidListLeft[i]))
+                {
+                    asteroidListLeft.RemoveAt(i);
+                    asteroidSpeedsLeft.RemoveAt(i);
+                    player1.Y = 670;
+                    player1Top.Y = 650;
+                    player1LeftBoost.Y = 690;
+                    player1RightBoost.Y = 690;
+                }
+            }
+
+            //check if player 2 hit an asteroid
+            for (int i = 0; i < asteroidListRight.Count(); i++)
+            {
+                if (player2.IntersectsWith(asteroidListRight[i]) || player2Top.IntersectsWith(asteroidListRight[i]))
+                {
+                    asteroidListRight.RemoveAt(i);
+                    asteroidSpeedsRight.RemoveAt(i);
+                    player2.Y = 670;
+                    player2Top.Y = 650;
+                    player2LeftBoost.Y = 690;
+                    player2RightBoost.Y = 690;
+                }
+            }
+            for (int i = 0; i < asteroidListLeft.Count(); i++)
+            {
+                if (player2.IntersectsWith(asteroidListLeft[i]) || player2Top.IntersectsWith(asteroidListLeft[i]))
+                {
+                    asteroidListLeft.RemoveAt(i);
+                    asteroidSpeedsLeft.RemoveAt(i);
+                    player2.Y = 670;
+                    player2Top.Y = 650;
+                    player2LeftBoost.Y = 690;
+                    player2RightBoost.Y = 690;
+                }
+            }
+
             //checking if a player has scored
             if (player1.Y < 0)
             {
                 player1Score++;
 
-                player1.Y = 500;
+                player1.Y = 670;
+                player1Top.Y = 650;
+                player1LeftBoost.Y = 690;
+                player1RightBoost.Y = 690;
 
                 //sleep beacuse otherwise the score never shows 3 but the game ends
                 Refresh();
@@ -198,6 +288,15 @@ namespace spaceGame
             if (player2.Y < 0)
             {
                 player2Score++;
+
+                player2.Y = 670;
+                player2Top.Y = 650;
+                player2LeftBoost.Y = 690;
+                player2RightBoost.Y = 690;
+
+                //sleep beacuse otherwise the score never shows 3 but the game ends
+                Refresh();
+                Thread.Sleep(5);
             }
 
             //checking if a player has won
@@ -221,13 +320,29 @@ namespace spaceGame
             {
 
             }
-            if (gameState == "playing")
+            else if (gameState == "playing")
             {
                 titleLabel.Text = "";
                 subtitleLabel.Text = "";
 
                 //draw the players
-                e.Graphics.FillRectangle(whiteBrush, player1);
+                e.Graphics.DrawRectangle(whitePen, player1);
+                e.Graphics.DrawRectangle(whitePen, player2);
+                e.Graphics.DrawRectangle(whitePen, player1Top);
+                e.Graphics.DrawRectangle(whitePen, player2Top);
+
+                //drawing boost
+                if (wDown == true)
+                {
+                    e.Graphics.FillRectangle(orangeBrush, player1LeftBoost);
+                    e.Graphics.FillRectangle(orangeBrush, player1RightBoost);
+                }
+                if (upDown == true)
+                {
+                    e.Graphics.FillRectangle(orangeBrush, player2LeftBoost);
+                    e.Graphics.FillRectangle(orangeBrush, player2RightBoost);
+                }
+
 
                 //draw left asteroids
                 for (int i = 0; i < asteroidListLeft.Count(); i++)
@@ -244,7 +359,7 @@ namespace spaceGame
                 Player1ScoreLabel.Text = $"{player1Score}";
                 Player2ScoreLabel.Text = $"{player2Score}";
             }
-            if (gameState == "endScreen")
+            else if (gameState == "endScreen")
             {
                 gameTimer.Enabled = false;
                 titleLabel.Text = "Space Race";
