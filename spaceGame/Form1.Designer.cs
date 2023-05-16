@@ -94,7 +94,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(600, 800);
+            this.ClientSize = new System.Drawing.Size(600, 700);
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.subtitleLabel);
             this.Controls.Add(this.Player2ScoreLabel);

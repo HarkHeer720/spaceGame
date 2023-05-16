@@ -133,7 +133,7 @@ namespace spaceGame
             {
                 player1.Y -= playerSpeed;
             }
-            if (sDown == true)
+            if (sDown == true && player1.Y < this.Height - player1.Height)
             {
                 player1.Y += playerSpeed;
             }
@@ -143,14 +143,14 @@ namespace spaceGame
             {
                 player2.Y -= playerSpeed;
             }
-            if (downDown == true)
+            if (downDown == true && player2.Y < this.Height - player2.Height)
             {
                 player2.Y += playerSpeed;
             }
 
             //create asteroids on left side
             randValue = randGen.Next(1, 101);
-            if (randValue <= 10)
+            if (randValue <= 14)
             {
                 randValue = randGen.Next(0, this.Height - 50);
                 asteroidSpeedsLeft.Add(randGen.Next(3, 10));
@@ -168,9 +168,9 @@ namespace spaceGame
 
             //create asteroids on right side
             randValue = randGen.Next(1, 101);
-            if (randValue <= 10)
+            if (randValue <= 14)
             {
-                randValue = randGen.Next(600, this.Height - 50);
+                randValue = randGen.Next(0, this.Height - 50);
                 asteroidSpeedsRight.Add(randGen.Next(3, 10));
 
                 Rectangle asteroid = new Rectangle(600, randValue, asteroidWidth, asteroidHeight);
@@ -180,14 +180,14 @@ namespace spaceGame
             //move right side asteroids
             for (int i = 0; i < asteroidListRight.Count(); i++)
             {
-                int x = asteroidListRight[i].Y - asteroidSpeedsRight[i];
+                int x = asteroidListRight[i].X - asteroidSpeedsRight[i];
                 asteroidListRight[i] = new Rectangle(x, asteroidListRight[i].Y, asteroidWidth, asteroidHeight);
             }
 
             //checking if a player has scored
             if (player1.Y < 0)
             {
-                player1Score ++;
+                player1Score++;
 
                 player1.Y = 500;
 
@@ -217,8 +217,17 @@ namespace spaceGame
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            //draw the players
-            e.Graphics.FillRectangle(whiteBrush, player1);
+            if (gameState == "startScreen")
+            {
+
+            }
+            if (gameState == "playing")
+            {
+                titleLabel.Text = "";
+                subtitleLabel.Text = "";
+
+                //draw the players
+                e.Graphics.FillRectangle(whiteBrush, player1);
 
                 //draw left asteroids
                 for (int i = 0; i < asteroidListLeft.Count(); i++)
