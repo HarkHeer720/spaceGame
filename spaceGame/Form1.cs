@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+//im the biggest bird im the biggest bird
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace spaceGame
 {
@@ -15,7 +17,8 @@ namespace spaceGame
         //creating lists
         List<Rectangle> asteroidListRight = new List<Rectangle>();
         List<Rectangle> asteroidListLeft = new List<Rectangle>();
-        List<int> asteroidSpeeds = new List<int>();
+        List<int> asteroidSpeedsLeft = new List<int>();
+        List<int> asteroidSpeedsRight = new List<int>();
 
         //declaring players
         Rectangle player1 = new Rectangle(50, 50, 50, 50);
@@ -23,12 +26,15 @@ namespace spaceGame
 
         //declaring a randomizer
         Random randGen = new Random();
-        int randValue;
 
         //declaring variables
         int playerSpeed = 6;
         int asteroidWidth = 15;
         int asteroidHeight = 5;
+        string gameState = "startScreen";
+        int player1Score = 0;
+        int player2Score = 0;
+        int randValue;
 
         //declaring button presses
         bool wDown = false;
@@ -38,19 +44,33 @@ namespace spaceGame
 
         //declaring brushes and pens
         SolidBrush whiteBrush = new SolidBrush(Color.White);
+
         public Form1()
         {
             InitializeComponent();
+        }
+        public void gameInitializer()
+        {
+            asteroidListRight.Clear();
+            asteroidListLeft.Clear();
+            asteroidSpeedsRight.Clear();
+            asteroidSpeedsLeft.Clear();
 
             randValue = randGen.Next(0, this.Height - 50);
-            asteroidSpeeds.Add(randGen.Next(5, 15));
+            asteroidSpeedsRight.Add(randGen.Next(3, 10));
 
-            Rectangle ball = new Rectangle(0, randValue, asteroidWidth, asteroidHeight);
-            asteroidListLeft.Add(ball);
+            Rectangle asteroid = new Rectangle(600, randValue, asteroidWidth, asteroidHeight);
+            asteroidListRight.Add(asteroid);
+
+            player1Score = 0;
+            player2Score = 0;
+
+            gameState = "playing";
+            gameTimer.Enabled = true;
         }
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            switch(e.KeyCode)
+            switch (e.KeyCode)
             {
                 case Keys.W:
                     wDown = true;
@@ -65,7 +85,24 @@ namespace spaceGame
                     downDown = true;
                     break;
                 case Keys.Escape:
-                    Application.Exit();
+                    if (gameState == "startScreen" || gameState == "endScreen")
+                    {
+                        Application.Exit();
+                    }
+                    else if (gameState == "playing")
+                    {
+
+                    }
+                    break;
+                case Keys.Space:
+                    if (gameState == "startScreen" || gameState == "endScreen")
+                    {
+                        gameInitializer();
+                    }
+                    else if (gameState == "playing")
+                    {
+
+                    }
                     break;
             }
         }
@@ -111,40 +148,68 @@ namespace spaceGame
                 player2.Y += playerSpeed;
             }
 
-            //move left side asteroids
-            for (int i = 0; i < asteroidListLeft.Count(); i++)
-            {
-                int x = asteroidListLeft[i].X + asteroidSpeeds[i];
-                asteroidListLeft[i] = new Rectangle(x, asteroidListLeft[i].Y, asteroidWidth, asteroidHeight);
-            }
-
             //create asteroids on left side
             randValue = randGen.Next(1, 101);
-            if (randValue <= 15)
+            if (randValue <= 10)
             {
                 randValue = randGen.Next(0, this.Height - 50);
-                asteroidSpeeds.Add(randGen.Next(3, 10));
+                asteroidSpeedsLeft.Add(randGen.Next(3, 10));
 
                 Rectangle ball = new Rectangle(0, randValue, asteroidWidth, asteroidHeight);
                 asteroidListLeft.Add(ball);
             }
 
-            //move right side asteroids
-            for (int i = 0; i < asteroidListRight.Count(); i++)
+            //move left side asteroids
+            for (int i = 0; i < asteroidListLeft.Count(); i++)
             {
-                int x = asteroidListRight[i].Y - asteroidSpeeds[i];
-                asteroidListRight[i] = new Rectangle(x, asteroidListRight[i].Y, asteroidWidth, asteroidHeight);
+                int x = asteroidListLeft[i].X + asteroidSpeedsLeft[i];
+                asteroidListLeft[i] = new Rectangle(x, asteroidListLeft[i].Y, asteroidWidth, asteroidHeight);
             }
 
             //create asteroids on right side
             randValue = randGen.Next(1, 101);
-            if (randValue <= 15)
+            if (randValue <= 10)
             {
                 randValue = randGen.Next(600, this.Height - 50);
-                asteroidSpeeds.Add(randGen.Next(3, 10));
+                asteroidSpeedsRight.Add(randGen.Next(3, 10));
 
-                Rectangle ball = new Rectangle(0, randValue, asteroidWidth, asteroidHeight);
-                asteroidListRight.Add(ball);
+                Rectangle asteroid = new Rectangle(600, randValue, asteroidWidth, asteroidHeight);
+                asteroidListRight.Add(asteroid);
+            }
+
+            //move right side asteroids
+            for (int i = 0; i < asteroidListRight.Count(); i++)
+            {
+                int x = asteroidListRight[i].Y - asteroidSpeedsRight[i];
+                asteroidListRight[i] = new Rectangle(x, asteroidListRight[i].Y, asteroidWidth, asteroidHeight);
+            }
+
+            //checking if a player has scored
+            if (player1.Y < 0)
+            {
+                player1Score ++;
+
+                player1.Y = 500;
+
+                //sleep beacuse otherwise the score never shows 3 but the game ends
+                Refresh();
+                Thread.Sleep(5);
+            }
+            if (player2.Y < 0)
+            {
+                player2Score++;
+            }
+
+            //checking if a player has won
+            if (player1Score >= 3)
+            {
+                subtitleLabel.Text = "Player 1 wins";
+                gameState = "endScreen";
+            }
+            if (player2Score == 3)
+            {
+                subtitleLabel.Text = "Player 2 wins";
+                gameState = "endScreen";
             }
 
             Refresh();
@@ -155,16 +220,26 @@ namespace spaceGame
             //draw the players
             e.Graphics.FillRectangle(whiteBrush, player1);
 
-            //draw left asteroids
-            for (int i = 0; i < asteroidListLeft.Count(); i++)
-            {
-                e.Graphics.FillRectangle(whiteBrush, asteroidListLeft[i]);
-            }
+                //draw left asteroids
+                for (int i = 0; i < asteroidListLeft.Count(); i++)
+                {
+                    e.Graphics.FillRectangle(whiteBrush, asteroidListLeft[i]);
+                }
 
-            //draw right asteroids
-            for (int i = 0; i < asteroidListRight.Count(); i++)
+                //draw right asteroids
+                for (int i = 0; i < asteroidListRight.Count(); i++)
+                {
+                    e.Graphics.FillRectangle(whiteBrush, asteroidListRight[i]);
+                }
+
+                Player1ScoreLabel.Text = $"{player1Score}";
+                Player2ScoreLabel.Text = $"{player2Score}";
+            }
+            if (gameState == "endScreen")
             {
-                e.Graphics.FillRectangle(whiteBrush, asteroidListRight[i]);
+                gameTimer.Enabled = false;
+                titleLabel.Text = "Space Race";
+                subtitleLabel.Text += "\nPress space to play again or press escape to exit";
             }
         }
     }
