@@ -86,5 +86,23 @@
   <ItemGroup>
     <None Include="Resources\mixkit-space-rocket-full-power-turbine-1720 %281%29.wav" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YAHOO SOUND EFFECT %28MARIO%29.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\YAHOO-SOUND-EFFECT-_MARIO_.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ES_Air Hockey Puck Goal - SFX Producer.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Fireworks-RocketTakeoff.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Fireworks-RocketTakeoff %281%29.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Minecraft TNT Explosion - Sound Effect %28HD%29.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

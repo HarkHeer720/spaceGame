@@ -118,10 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="rocketSound" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\mixkit-space-rocket-full-power-turbine-1720.wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="explosionSound" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Minecraft TNT Explosion - Sound Effect (HD).wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="rocketSound2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\mixkit-space-rocket-full-power-turbine-1720 (1).wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="scoreSound" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\YAHOO SOUND EFFECT (MARIO).wav;System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

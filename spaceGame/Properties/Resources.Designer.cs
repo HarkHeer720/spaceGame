@@ -63,18 +63,18 @@ namespace spaceGame.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream rocketSound {
+        internal static System.IO.UnmanagedMemoryStream explosionSound {
             get {
-                return ResourceManager.GetStream("rocketSound", resourceCulture);
+                return ResourceManager.GetStream("explosionSound", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream rocketSound2 {
+        internal static System.IO.UnmanagedMemoryStream scoreSound {
             get {
-                return ResourceManager.GetStream("rocketSound2", resourceCulture);
+                return ResourceManager.GetStream("scoreSound", resourceCulture);
             }
         }
     }

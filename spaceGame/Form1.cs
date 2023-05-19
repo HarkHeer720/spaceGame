@@ -20,13 +20,17 @@ namespace spaceGame
         List<Rectangle> asteroidListLeft = new List<Rectangle>();
         List<int> asteroidSpeedsLeft = new List<int>();
         List<int> asteroidSpeedsRight = new List<int>();
+        List<Rectangle> asteroidSpecialRight = new List<Rectangle>();
+        List<Rectangle> asteroidSpecialLeft = new List<Rectangle>();
+        List<int> asteroidSpeedsRightSpecial = new List<int>();
+        List<int> asteroidSpeedsLeftSpecial = new List<int>();
 
         //declaring players
         Rectangle player1 = new Rectangle(145, 670, 20, 20);
         Rectangle player2 = new Rectangle(445, 670, 20, 20);
 
-        Rectangle player1Top = new Rectangle(150, 650, 10, 20);
-        Rectangle player2Top = new Rectangle(450, 650, 10, 20);
+        Rectangle player1Middle = new Rectangle(150, 650, 10, 20);
+        Rectangle player2Middle = new Rectangle(450, 650, 10, 20);
 
         Rectangle player1LeftBoost = new Rectangle(145, 690, 5, 10);
         Rectangle player1RightBoost = new Rectangle(161, 690, 5, 10);
@@ -38,7 +42,8 @@ namespace spaceGame
         Random randGen = new Random();
 
         //declaring variables
-        int playerSpeed = 6;
+        int player1Speed = 6;
+        int player2Speed = 6;
         int asteroidWidth = 15;
         int asteroidHeight = 5;
         string gameState = "startScreen";
@@ -55,15 +60,19 @@ namespace spaceGame
         //declaring brushes and pens
         SolidBrush whiteBrush = new SolidBrush(Color.White);
         SolidBrush orangeBrush = new SolidBrush(Color.Orange);
+        SolidBrush purpleBrush = new SolidBrush(Color.Purple);
+        SolidBrush greenBrush = new SolidBrush(Color.Green);
         Pen whitePen = new Pen(Color.White, 4);
 
         //creating sound effetcs
-        SoundPlayer rocketSound = new SoundPlayer(Properties.Resources.rocketSound2);
+        SoundPlayer scoreSound = new SoundPlayer(Properties.Resources.scoreSound);
+        SoundPlayer explosionSound = new SoundPlayer(Properties.Resources.explosionSound);
 
         public Form1()
         {
             InitializeComponent();
         }
+
         public void gameInitializer()
         {
             asteroidListRight.Clear();
@@ -71,11 +80,16 @@ namespace spaceGame
             asteroidSpeedsRight.Clear();
             asteroidSpeedsLeft.Clear();
 
-            randValue = randGen.Next(0, this.Height - 50);
+            randValue = randGen.Next(0, this.Height - 70);
             asteroidSpeedsRight.Add(randGen.Next(3, 10));
 
             Rectangle asteroid = new Rectangle(600, randValue, asteroidWidth, asteroidHeight);
             asteroidListRight.Add(asteroid);
+
+            randValue = randGen.Next(0, this.Height - 70);
+
+            Rectangle special = new Rectangle(600, randValue, asteroidWidth, asteroidHeight);
+            asteroidSpecialRight.Add(special);
 
             player1Score = 0;
             player2Score = 0;
@@ -83,6 +97,7 @@ namespace spaceGame
             gameState = "playing";
             gameTimer.Enabled = true;
         }
+
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
@@ -146,52 +161,53 @@ namespace spaceGame
             //move player 1
             if (wDown == true)
             {
-                player1.Y -= playerSpeed;
-                player1Top.Y -= playerSpeed;
-                player1LeftBoost.Y -= playerSpeed;
-                player1RightBoost.Y -= playerSpeed;
-
-                rocketSound.Play();
+                player1.Y -= player1Speed;
+                player1Middle.Y -= player1Speed;
+                player1LeftBoost.Y -= player1Speed;
+                player1RightBoost.Y -= player1Speed;
             }
             if (sDown == true && player1.Y < this.Height - player1.Height)
             {
-                player1.Y += playerSpeed;
-                player1Top.Y += playerSpeed;
-                player1LeftBoost.Y += playerSpeed;
-                player1RightBoost.Y += playerSpeed;
-
-                rocketSound.Stop();
+                player1.Y += player1Speed;
+                player1Middle.Y += player1Speed;
+                player1LeftBoost.Y += player1Speed;
+                player1RightBoost.Y += player1Speed;
             }
 
             //move player 2
             if (upDown == true)
             {
-                player2.Y -= playerSpeed;
-                player2Top.Y -= playerSpeed;
-                player2LeftBoost.Y -= playerSpeed;
-                player2RightBoost.Y -= playerSpeed;
-
-                rocketSound.Play();
+                player2.Y -= player2Speed;
+                player2Middle.Y -= player2Speed;
+                player2LeftBoost.Y -= player2Speed;
+                player2RightBoost.Y -= player2Speed;
             }
             if (downDown == true && player2.Y < this.Height - player2.Height)
             {
-                player2.Y += playerSpeed;
-                player2Top.Y += playerSpeed;
-                player2LeftBoost.Y += playerSpeed;
-                player2RightBoost.Y += playerSpeed;
-
-                rocketSound.Stop();
+                player2.Y += player2Speed;
+                player2Middle.Y += player2Speed;
+                player2LeftBoost.Y += player2Speed;
+                player2RightBoost.Y += player2Speed;
             }
 
             //create asteroids on left side
             randValue = randGen.Next(1, 101);
-            if (randValue <= 14)
+            if (randValue <= 12)
             {
-                randValue = randGen.Next(0, this.Height - 50);
+                randValue = randGen.Next(0, this.Height - 70);
                 asteroidSpeedsLeft.Add(randGen.Next(3, 10));
 
                 Rectangle ball = new Rectangle(0, randValue, asteroidWidth, asteroidHeight);
                 asteroidListLeft.Add(ball);
+            }
+
+            //create left side special asteroids
+            else if (randValue > 95)
+            {
+                randValue = randGen.Next(0, this.Height - 70);
+
+                Rectangle asteroid = new Rectangle(0, randValue, asteroidWidth, asteroidHeight);
+                asteroidSpecialLeft.Add(asteroid);
             }
 
             //move left side asteroids
@@ -199,17 +215,41 @@ namespace spaceGame
             {
                 int x = asteroidListLeft[i].X + asteroidSpeedsLeft[i];
                 asteroidListLeft[i] = new Rectangle(x, asteroidListLeft[i].Y, asteroidWidth, asteroidHeight);
+
+                if (asteroidListLeft[i].X > 600)
+                {
+                    asteroidListLeft.RemoveAt(i);
+                    asteroidSpeedsLeft.RemoveAt(i);
+                }
+            }
+
+            //move left side special asteroids
+            for (int i = 0; i < asteroidSpecialLeft.Count(); i++)
+            {
+                asteroidSpeedsLeftSpecial.Add(randGen.Next(3, 10));
+
+                int x = asteroidSpecialLeft[i].X + asteroidSpeedsLeftSpecial[i];
+                asteroidSpecialLeft[i] = new Rectangle(x, asteroidSpecialLeft[i].Y, asteroidWidth, asteroidHeight);
             }
 
             //create asteroids on right side
             randValue = randGen.Next(1, 101);
-            if (randValue <= 14)
+            if (randValue <= 12)
             {
-                randValue = randGen.Next(0, this.Height - 50);
+                randValue = randGen.Next(0, this.Height - 70);
                 asteroidSpeedsRight.Add(randGen.Next(3, 10));
 
                 Rectangle asteroid = new Rectangle(600, randValue, asteroidWidth, asteroidHeight);
                 asteroidListRight.Add(asteroid);
+            }
+
+            //create right side special asteroids
+            else if (randValue > 95)
+            {
+                randValue = randGen.Next(0, this.Height - 70);
+
+                Rectangle asteroid = new Rectangle(600, randValue, asteroidWidth, asteroidHeight);
+                asteroidSpecialRight.Add(asteroid);
             }
 
             //move right side asteroids
@@ -217,69 +257,167 @@ namespace spaceGame
             {
                 int x = asteroidListRight[i].X - asteroidSpeedsRight[i];
                 asteroidListRight[i] = new Rectangle(x, asteroidListRight[i].Y, asteroidWidth, asteroidHeight);
+
+                if (asteroidListRight[i].X < 0)
+                {
+                    asteroidListRight.RemoveAt(i);
+                    asteroidSpeedsRight.RemoveAt(i);
+                }
+            }
+
+            //move right side special asteroids
+            for (int i = 0; i < asteroidSpecialRight.Count(); i++)
+            {
+                asteroidSpeedsRightSpecial.Add(randGen.Next(3, 10));
+
+                int x = asteroidSpecialRight[i].X - asteroidSpeedsRightSpecial[i];
+                asteroidSpecialRight[i] = new Rectangle(x, asteroidSpecialRight[i].Y, asteroidWidth, asteroidHeight);
             }
 
             //check if player 1 hit an asteroid
             for (int i = 0; i < asteroidListRight.Count(); i++)
             {
-                if (player1.IntersectsWith(asteroidListRight[i]) || player1Top.IntersectsWith(asteroidListRight[i]))
+                if (player1.IntersectsWith(asteroidListRight[i]) || player1Middle.IntersectsWith(asteroidListRight[i]))
                 {
+                    explosionSound.Play();
+
                     asteroidListRight.RemoveAt(i);
                     asteroidSpeedsRight.RemoveAt(i);
                     player1.Y = 670;
-                    player1Top.Y = 650;
+                    player1Middle.Y = 650;
                     player1LeftBoost.Y = 690;
                     player1RightBoost.Y = 690;
+                    player1Speed = 6;
                 }
             }
             for (int i = 0; i < asteroidListLeft.Count(); i++)
             {
-                if (player1.IntersectsWith(asteroidListLeft[i]) || player1Top.IntersectsWith(asteroidListLeft[i]))
+                if (player1.IntersectsWith(asteroidListLeft[i]) || player1Middle.IntersectsWith(asteroidListLeft[i]))
                 {
+                    explosionSound.Play();
+
                     asteroidListLeft.RemoveAt(i);
                     asteroidSpeedsLeft.RemoveAt(i);
                     player1.Y = 670;
-                    player1Top.Y = 650;
+                    player1Middle.Y = 650;
                     player1LeftBoost.Y = 690;
                     player1RightBoost.Y = 690;
+                    player1Speed = 6;
+                }
+            }
+
+            //checking if player 1 hit a special asteroid and giving the appropriate powerup or debuff
+            for (int i = 0; i < asteroidSpecialRight.Count(); i++)
+            {
+                if (player1.IntersectsWith(asteroidSpecialRight[i]) || player1Middle.IntersectsWith(asteroidSpecialRight[i]))
+                {
+                    if (player1Speed > 12)
+                    {
+
+                    }
+                    else
+                    {
+                        player1Speed *= 2;
+                    }
+                    asteroidSpecialRight.RemoveAt(i);
+                    asteroidSpeedsRightSpecial.RemoveAt(i);
+                }
+            }
+            for (int i = 0; i < asteroidSpecialLeft.Count(); i++)
+            {
+                if (player1.IntersectsWith(asteroidSpecialLeft[i]) || player1Middle.IntersectsWith(asteroidSpecialLeft[i]))
+                {
+                    if (player1Speed < 2)
+                    {
+
+                    }
+                    else
+                    {
+                        player1Speed /= 2;
+                    }
+                    asteroidSpecialLeft.RemoveAt(i);
+                    asteroidSpeedsLeftSpecial.RemoveAt(i);
                 }
             }
 
             //check if player 2 hit an asteroid
             for (int i = 0; i < asteroidListRight.Count(); i++)
             {
-                if (player2.IntersectsWith(asteroidListRight[i]) || player2Top.IntersectsWith(asteroidListRight[i]))
+                if (player2.IntersectsWith(asteroidListRight[i]) || player2Middle.IntersectsWith(asteroidListRight[i]))
                 {
+                    explosionSound.Play();
+
                     asteroidListRight.RemoveAt(i);
                     asteroidSpeedsRight.RemoveAt(i);
                     player2.Y = 670;
-                    player2Top.Y = 650;
+                    player2Middle.Y = 650;
                     player2LeftBoost.Y = 690;
                     player2RightBoost.Y = 690;
+                    player2Speed = 6;
                 }
             }
             for (int i = 0; i < asteroidListLeft.Count(); i++)
             {
-                if (player2.IntersectsWith(asteroidListLeft[i]) || player2Top.IntersectsWith(asteroidListLeft[i]))
+                if (player2.IntersectsWith(asteroidListLeft[i]) || player2Middle.IntersectsWith(asteroidListLeft[i]))
                 {
+                    explosionSound.Play();
+
                     asteroidListLeft.RemoveAt(i);
                     asteroidSpeedsLeft.RemoveAt(i);
                     player2.Y = 670;
-                    player2Top.Y = 650;
+                    player2Middle.Y = 650;
                     player2LeftBoost.Y = 690;
                     player2RightBoost.Y = 690;
+                    player2Speed = 6;
                 }
             }
 
+            //checking if player 2 hit a special asteroid and giving the appropriate powerup or debuff
+            for (int i = 0; i < asteroidSpecialRight.Count(); i++)
+            {
+                if (player2.IntersectsWith(asteroidSpecialRight[i]) || player2Middle.IntersectsWith(asteroidSpecialRight[i]))
+                {
+                    if (player2Speed > 12)
+                    {
+
+                    }
+                    else
+                    {
+                        player2Speed *= 2;
+                    }
+                    asteroidSpecialRight.RemoveAt(i);
+                    asteroidSpeedsRightSpecial.RemoveAt(i);
+                }
+            }
+            for (int i = 0; i < asteroidSpecialLeft.Count(); i++)
+            {
+                if (player2.IntersectsWith(asteroidSpecialLeft[i]) || player2Middle.IntersectsWith(asteroidSpecialLeft[i]))
+                {
+                    if (player2Speed < 2)
+                    {
+
+                    }
+                    else
+                    {
+                        player2Speed /= 2;
+                    }
+                    asteroidSpecialLeft.RemoveAt(i);
+                    asteroidSpeedsLeftSpecial.RemoveAt(i);
+                }
+            }
             //checking if a player has scored
             if (player1.Y < 0)
             {
+                scoreSound.Play();
+
                 player1Score++;
 
                 player1.Y = 670;
-                player1Top.Y = 650;
+                player1Middle.Y = 650;
                 player1LeftBoost.Y = 690;
                 player1RightBoost.Y = 690;
+
+                player1Speed = 6;
 
                 //sleep beacuse otherwise the score never shows 3 but the game ends
                 Refresh();
@@ -287,12 +425,16 @@ namespace spaceGame
             }
             if (player2.Y < 0)
             {
+                scoreSound.Play();
+
                 player2Score++;
 
                 player2.Y = 670;
-                player2Top.Y = 650;
+                player2Middle.Y = 650;
                 player2LeftBoost.Y = 690;
                 player2RightBoost.Y = 690;
+
+                player2Speed = 6;
 
                 //sleep beacuse otherwise the score never shows 3 but the game ends
                 Refresh();
@@ -328,8 +470,8 @@ namespace spaceGame
                 //draw the players
                 e.Graphics.DrawRectangle(whitePen, player1);
                 e.Graphics.DrawRectangle(whitePen, player2);
-                e.Graphics.DrawRectangle(whitePen, player1Top);
-                e.Graphics.DrawRectangle(whitePen, player2Top);
+                e.Graphics.DrawRectangle(whitePen, player1Middle);
+                e.Graphics.DrawRectangle(whitePen, player2Middle);
 
                 //drawing boost
                 if (wDown == true)
@@ -343,17 +485,28 @@ namespace spaceGame
                     e.Graphics.FillRectangle(orangeBrush, player2RightBoost);
                 }
 
-
                 //draw left asteroids
                 for (int i = 0; i < asteroidListLeft.Count(); i++)
                 {
                     e.Graphics.FillRectangle(whiteBrush, asteroidListLeft[i]);
                 }
 
+                //draw left side special asteroids
+                for (int i = 0; i < asteroidSpecialLeft.Count(); i++)
+                {
+                    e.Graphics.FillRectangle(greenBrush, asteroidSpecialLeft[i]);
+                }
+
                 //draw right asteroids
                 for (int i = 0; i < asteroidListRight.Count(); i++)
                 {
                     e.Graphics.FillRectangle(whiteBrush, asteroidListRight[i]);
+                }
+
+                //draw right side special asteroids
+                for (int i = 0; i < asteroidSpecialRight.Count(); i++)
+                {
+                    e.Graphics.FillRectangle(purpleBrush, asteroidSpecialRight[i]);
                 }
 
                 Player1ScoreLabel.Text = $"{player1Score}";
